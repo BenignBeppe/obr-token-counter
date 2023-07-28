@@ -5,3 +5,22 @@ body {
 input[type="number"] {
     width: 4em;
 }
+
+.icon {
+    width: 1em;
+    height: 1em;
+    mask-size: cover;
+    background-color: #fff;
+}
+
+#show-number .icon {
+    mask-image: url(/images/number.svg)
+}
+
+#hide .icon {
+    mask-image: url(/images/hide.svg)
+}
+
+.selected .icon {
+    background-color: rgb(187, 153, 255);
+}
