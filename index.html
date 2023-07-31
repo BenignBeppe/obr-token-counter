@@ -9,12 +9,27 @@
         <title>Token counter</title>
     </head>
     <body>
-        <input id="value" type="number" value="0" min="0">
-        <button id="hide">
-            <div class="icon"></div>
-        </button>
-        <button id="show-number">
-            <div class="icon icon-number"></div>
-        </button>
+        <section>
+            <button id="add-counter">
+                <img src="images/add.svg">
+            </button>
+        </section>
+        <ol id="counters"></ol>
+
+        <div id="templates" hidden>
+            <li class="counter">
+                <input class="value" type="number">
+                <button class="hide">
+                    <div class="icon"></div>
+                </button>
+                <button class="show-number">
+                    <div class="icon icon-number"></div>
+                </button>
+                <input class="colour" type="color">
+                <button class="remove">
+                    <img src="images/remove.svg">
+                </button>
+            </li>
+        </div>
     </body>
 </html>

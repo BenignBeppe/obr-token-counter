@@ -13,11 +13,11 @@ input[type="number"] {
     background-color: #fff;
 }
 
-#show-number .icon {
+.show-number .icon {
     mask-image: url(/images/number.svg)
 }
 
-#hide .icon {
+.hide .icon {
     mask-image: url(/images/hide.svg)
 }
 
