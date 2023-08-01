@@ -74,6 +74,7 @@ async function getVisualisations(token, startIndex) {
 
 async function createVisualisation(token, counterIndex) {
     let metadata = token.metadata[getPluginId("counters")][counterIndex];
+    let visible = !token.metadata[getPluginId("gmOnly")];
     let item = buildText()
         .textType("PLAIN")
         .plainText(String(metadata.value))
@@ -83,6 +84,7 @@ async function createVisualisation(token, counterIndex) {
         .strokeColor("black")
         .strokeWidth(2)
         .attachedTo(token.id)
+        .visible(visible)
         .locked(true)
         .metadata({
             [getPluginId("role")]: VISUALISATION,
