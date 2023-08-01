@@ -3,6 +3,7 @@ import { getPluginId, log } from "./util.js";
 import {
     setVisualisationValue,
     setVisualisationColour,
+    setVisualisationsGmOnly,
     addVisualisation,
     removeVisualisation,
     getVisualisation,
@@ -68,8 +69,39 @@ async function getItem(itemId) {
     return items[0];
 }
 
+async function toggleGmOnly() {
+    let token = await getSelectedToken();
+    if(!token) {
+        return;
+    }
+
+    let playerRole = await OBR.player.getRole();
+    if(playerRole !== "GM") {
+        return;
+    }
+
+    let gmOnly = token.metadata[getPluginId("gmOnly")];
+    gmOnly = !gmOnly;
+    OBR.scene.items.updateItems([token], (items) => {
+        for(let item of items) {
+            item.metadata[getPluginId("gmOnly")] = gmOnly;
+        }
+    });
+    setVisualisationsGmOnly(token, gmOnly);
+    updateGmOnlyButton(gmOnly);
+}
+
+function updateGmOnlyButton(gmOnly) {
+    if(gmOnly) {
+        gmOnlyButton.classList.add("selected");
+    } else {
+        gmOnlyButton.classList.remove("selected");
+    }
+}
+
 function updateCounters(token) {
-    let counters = token.metadata[getPluginId("counters")];
+    let counters = token.metadata[getPluginId("counters")] || [];
+
     let elements = [];
     for(let [index, counter] of counters.entries()) {
         let template = document.querySelector("#templates .counter");
@@ -178,16 +210,35 @@ async function removeCounter(tokenId, counterIndex) {
     log(`Removed counter with index ${counterIndex} from token ${token.id} ("${token.name})"`);
 }
 
+function clearCounters() {
+    let counterList = document.querySelector("#counters");
+    counterList.replaceChildren();
+}
+
 document.querySelector("#add-counter").addEventListener("click", addCounter);
+let gmOnlyButton = document.querySelector("#gm-only");
+gmOnlyButton.addEventListener("click", toggleGmOnly);
 
 OBR.onReady(() => {
     OBR.player.onChange(async (player) => {
         let selection = player.selection;
         let token = await getToken(player.selection);
         if(!token) {
+            clearCounters();
+            updateGmOnlyButton(false);
             return;
         }
 
+        let gmOnly = token.metadata[getPluginId("gmOnly")];
+        if(gmOnly) {
+            let playerRole = await OBR.player.getRole();
+            if(playerRole !== "GM") {
+                clearPopover();
+                return;
+            }
+        }
+
+        updateGmOnlyButton(gmOnly);
         updateCounters(token);
     });
 });

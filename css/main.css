@@ -21,6 +21,10 @@ input[type="number"] {
     mask-image: url(/images/hide.svg)
 }
 
+#gm-only .icon {
+    mask-image: url(/images/gm-only.svg)
+}
+
 .selected .icon {
     background-color: rgb(187, 153, 255);
 }

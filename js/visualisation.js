@@ -1,6 +1,7 @@
 export {
     setVisualisationValue,
     setVisualisationColour,
+    setVisualisationsGmOnly,
     addVisualisation,
     removeVisualisation,
     getVisualisation,
@@ -35,6 +36,19 @@ async function setVisualisationColour(token, counterIndex, colour) {
     OBR.scene.items.updateItems(visualisation, (items) => {
         for (let item of items) {
             item.text.style.fillColor = colour;
+        }
+    });
+}
+
+async function setVisualisationsGmOnly(token, gmOnly) {
+    let visualisations = await getVisualisations(token);
+    if(!visualisations.length) {
+        return;
+    }
+
+    OBR.scene.items.updateItems(visualisations, (items) => {
+        for (let item of items) {
+            item.visible = !gmOnly;
         }
     });
 }
