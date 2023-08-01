@@ -26,6 +26,7 @@ async function addCounter() {
             }
             item.metadata[getPluginId("counters")].push({
                 value: 0,
+                maxValue: 0,
                 showAs: HIDDEN,
                 colour: "#ffffff"
             });
@@ -115,6 +116,13 @@ function updateCounters(token) {
             () => updateValue(token.id, index, valueInput)
         );
 
+        let maxValueInput = element.querySelector(".max-value");
+        maxValueInput.value = metadata.maxValue;
+        maxValueInput.addEventListener(
+            "change",
+            () => updateMaxValue(token.id, index, maxValueInput)
+        );
+
         let showSettingsButton = element.querySelector(".show-settings");
         let settings = element.querySelector(".settings");
         showSettingsButton.addEventListener(
@@ -174,7 +182,20 @@ async function updateValue(tokenId, counterIndex, valueInput) {
             item.metadata[getPluginId("counters")][counterIndex].value = value;
         }
     });
-    setVisualisationValue(token, counterIndex, value);
+    let maxValue = token.metadata[getPluginId("counters")][counterIndex].maxValue;
+    setVisualisationValue(token, counterIndex, value, maxValue);
+}
+
+async function updateMaxValue(tokenId, counterIndex, maxValueInput) {
+    let token = await getItem(tokenId);
+    let maxValue = Number(maxValueInput.value);
+    OBR.scene.items.updateItems([token], (items) => {
+        for(let item of items) {
+            item.metadata[getPluginId("counters")][counterIndex].maxValue = maxValue;
+        }
+    });
+    let value = token.metadata[getPluginId("counters")][counterIndex].value;
+    setVisualisationValue(token, counterIndex, value, maxValue);
 }
 
 function toggleShowSettings(showSettingsButton, settings) {

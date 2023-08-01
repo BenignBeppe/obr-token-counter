@@ -14,7 +14,7 @@ import { getPluginId } from "./util.js";
 const VISUALISATION = "VISUALISATION";
 const VISUALISATION_HEIGHT = 50;
 
-async function setVisualisationValue(token, counterIndex, value) {
+async function setVisualisationValue(token, counterIndex, value, maxValue) {
     let visualisation = await getVisualisation(token, counterIndex);
     if(!visualisation.length) {
         return;
@@ -22,9 +22,17 @@ async function setVisualisationValue(token, counterIndex, value) {
 
     OBR.scene.items.updateItems(visualisation, (items) => {
         for (let item of items) {
-            item.text.plainText = String(value);
+            item.text.plainText = makeValueString(value, maxValue);
         }
     });
+}
+
+function makeValueString(value, maxValue) {
+    let text = `${value}`;
+    if(maxValue !== 0) {
+        text += `/${maxValue}`;
+    }
+    return text;
 }
 
 async function setVisualisationColour(token, counterIndex, colour) {
@@ -77,7 +85,7 @@ async function createVisualisation(token, counterIndex) {
     let visible = !token.metadata[getPluginId("gmOnly")];
     let item = buildText()
         .textType("PLAIN")
-        .plainText(String(metadata.value))
+        .plainText(makeValueString(metadata.value, metadata.maxValue))
         .fontSize(VISUALISATION_HEIGHT)
         .fontWeight(700)
         .fillColor(metadata.colour)
