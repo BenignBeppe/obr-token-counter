@@ -9,7 +9,7 @@
         <title>Token counter</title>
     </head>
     <body>
-        <section>
+        <section id="controls">
             <button id="add-counter">
                 <img src="images/add.svg" title="Add counter">
             </button>
@@ -22,16 +22,21 @@
         <div id="templates" hidden>
             <li class="counter">
                 <input class="value" type="number">
-                <button class="hide" title="Hide counter">
+                <button class="show-settings" title="Show counter settings">
                     <div class="icon"></div>
                 </button>
-                <button class="show-number" title="Show counter as number">
-                    <div class="icon"></div>
-                </button>
-                <input class="colour" type="color" title="Set colour for counter">
-                <button class="remove" title="Remove counter">
-                    <img src="images/remove.svg">
-                </button>
+                <section class="settings" hidden>
+                    <button class="hide" title="Hide counter">
+                        <div class="icon"></div>
+                    </button>
+                    <button class="show-number" title="Show counter as number">
+                        <div class="icon"></div>
+                    </button>
+                    <input class="colour" type="color" title="Set colour for counter">
+                    <button class="remove" title="Remove counter">
+                        <img src="images/remove.svg">
+                    </button>
+                </section>
             </li>
         </div>
     </body>

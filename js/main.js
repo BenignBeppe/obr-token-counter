@@ -115,6 +115,13 @@ function updateCounters(token) {
             () => updateValue(token.id, index, valueInput)
         );
 
+        let showSettingsButton = element.querySelector(".show-settings");
+        let settings = element.querySelector(".settings");
+        showSettingsButton.addEventListener(
+            "click",
+            () => toggleShowSettings(showSettingsButton, settings)
+        );
+
         let hideButton = element.querySelector(".hide");
         if(metadata.showAs === HIDDEN) {
             hideButton.classList.add("selected");
@@ -168,6 +175,15 @@ async function updateValue(tokenId, counterIndex, valueInput) {
         }
     });
     setVisualisationValue(token, counterIndex, value);
+}
+
+function toggleShowSettings(showSettingsButton, settings) {
+    settings.hidden = !settings.hidden;
+    if(settings.hidden) {
+        showSettingsButton.classList.remove("selected");
+    } else {
+        showSettingsButton.classList.add("selected");
+    }
 }
 
 async function updateShowAs(tokenId, counterIndex, showAs) {
