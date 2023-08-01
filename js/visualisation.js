@@ -92,6 +92,7 @@ async function createVisualisation(token, counterIndex) {
         .strokeColor("black")
         .strokeWidth(2)
         .attachedTo(token.id)
+        .disableAttachmentBehavior(["SCALE", "ROTATION"])
         .visible(visible)
         .locked(true)
         .metadata({
