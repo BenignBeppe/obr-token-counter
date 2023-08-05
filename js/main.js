@@ -1,17 +1,6 @@
 import OBR, { buildText } from "@owlbear-rodeo/sdk";
 import { getPluginId, log } from "./util.js";
-import {
-    setVisualisationValue,
-    setVisualisationColour,
-    setVisualisationsGmOnly,
-    addVisualisation,
-    removeVisualisation,
-    getVisualisation,
-    hideVisualisation
-} from "./visualisation.js";
-
-const HIDDEN = "HIDDEN";
-const NUMBER = "NUMBER";
+import * as visualisation from "./visualisation.js";
 
 async function addCounter() {
     let token = await getSelectedToken();
@@ -27,7 +16,7 @@ async function addCounter() {
             item.metadata[getPluginId("counters")].push({
                 value: 0,
                 maxValue: 0,
-                showAs: HIDDEN,
+                showAs: visualisation.HIDDEN,
                 colour: "#ffffff"
             });
         }
@@ -88,7 +77,7 @@ async function toggleGmOnly() {
             item.metadata[getPluginId("gmOnly")] = gmOnly;
         }
     });
-    setVisualisationsGmOnly(token, gmOnly);
+    visualisation.setGmOnly(token, gmOnly);
     updateGmOnlyButton(gmOnly);
 }
 
@@ -131,29 +120,39 @@ function updateCounters(token) {
         );
 
         let hideButton = element.querySelector(".hide");
-        if(metadata.showAs === HIDDEN) {
+        if(metadata.showAs === visualisation.HIDDEN) {
             hideButton.classList.add("selected");
         }
         hideButton.addEventListener(
             "click",
-            () => {
-                updateShowAs(token.id, index, HIDDEN);
-                hideButton.classList.add("selected");
-                showNumberButton.classList.remove("selected");
-            }
+            () => updateShowAs(token.id, index, visualisation.HIDDEN)
         );
         let showNumberButton = element.querySelector(".show-number");
-        if(metadata.showAs === NUMBER) {
+        if(metadata.showAs === visualisation.NUMBER) {
             showNumberButton.classList.add("selected");
         }
         showNumberButton.addEventListener(
             "click",
-            () => {
-                updateShowAs(token.id, index, NUMBER);
-                hideButton.classList.remove("selected");
-                showNumberButton.classList.add("selected");
-            }
+            () => updateShowAs(token.id, index, visualisation.NUMBER)
         );
+        let showBarButton = element.querySelector(".show-bar");
+        if(metadata.showAs === visualisation.BAR) {
+            showBarButton.classList.add("selected");
+        }
+        showBarButton.addEventListener(
+            "click",
+            () => updateShowAs(token.id, index, visualisation.BAR)
+        );
+        for(let showAsButton of [hideButton, showNumberButton, showBarButton]) {
+            showAsButton.addEventListener(
+                "click",
+                () => {
+                    let selected = settings.querySelector(".selected");
+                    selected.classList.remove("selected");
+                    showAsButton.classList.add("selected");
+                }
+            );
+        }
 
         let colourInput = element.querySelector(".colour");
         colourInput.value = metadata.colour;
@@ -183,7 +182,7 @@ async function updateValue(tokenId, counterIndex, valueInput) {
         }
     });
     let maxValue = token.metadata[getPluginId("counters")][counterIndex].maxValue;
-    setVisualisationValue(token, counterIndex, value, maxValue);
+    visualisation.setValue(token, counterIndex, value, maxValue);
 }
 
 async function updateMaxValue(tokenId, counterIndex, maxValueInput) {
@@ -195,7 +194,7 @@ async function updateMaxValue(tokenId, counterIndex, maxValueInput) {
         }
     });
     let value = token.metadata[getPluginId("counters")][counterIndex].value;
-    setVisualisationValue(token, counterIndex, value, maxValue);
+    visualisation.setValue(token, counterIndex, value, maxValue);
 }
 
 function toggleShowSettings(showSettingsButton, settings) {
@@ -209,15 +208,22 @@ function toggleShowSettings(showSettingsButton, settings) {
 
 async function updateShowAs(tokenId, counterIndex, showAs) {
     let token = await getItem(tokenId);
+    let counterMetadata = token.metadata[getPluginId("counters")][counterIndex];
+    if(showAs === counterMetadata.showAs) {
+        // Nothing to do if the visualisation type stays the same.
+        return;
+    }
+
     OBR.scene.items.updateItems([token], (items) => {
         for(let item of items) {
             item.metadata[getPluginId("counters")][counterIndex].showAs = showAs;
         }
     });
-    if(showAs === HIDDEN) {
-        hideVisualisation(token, counterIndex);
-    } else if(showAs === NUMBER) {
-        addVisualisation(token, counterIndex);
+    let updatedToken = await getItem(token.id);
+    if(showAs === visualisation.HIDDEN) {
+        visualisation.hide(updatedToken, counterIndex);
+    } else {
+        visualisation.add(updatedToken, counterIndex, showAs);
     }
 }
 
@@ -229,7 +235,7 @@ async function updateColour(tokenId, counterIndex, colourInput) {
             item.metadata[getPluginId("counters")][counterIndex].colour = colour;
         }
     });
-    setVisualisationColour(token, counterIndex, colour);
+    visualisation.setColour(token, counterIndex, colour);
 }
 
 async function removeCounter(tokenId, counterIndex) {
@@ -243,7 +249,7 @@ async function removeCounter(tokenId, counterIndex) {
     // We need to get the token again here to get the updated state.
     let updatedToken = await getItem(tokenId);
     updateCounters(updatedToken);
-    removeVisualisation(updatedToken, counterIndex);
+    visualisation.remove(updatedToken, counterIndex);
     log(`Removed counter with index ${counterIndex} from token ${token.id} ("${token.name})"`);
 }
 
@@ -258,7 +264,6 @@ gmOnlyButton.addEventListener("click", toggleGmOnly);
 
 OBR.onReady(() => {
     OBR.player.onChange(async (player) => {
-        let selection = player.selection;
         let token = await getToken(player.selection);
         if(!token) {
             clearCounters();
