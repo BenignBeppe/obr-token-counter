@@ -112,6 +112,12 @@ function updateCounters(token) {
             () => updateMaxValue(token.id, index, maxValueInput)
         );
 
+        let modifyInput = element.querySelector(".modify");
+        modifyInput.addEventListener(
+            "change",
+            () => modifyValue(token.id, index, modifyInput, valueInput)
+        );
+
         let showSettingsButton = element.querySelector(".show-settings");
         let settings = element.querySelector(".settings");
         showSettingsButton.addEventListener(
@@ -195,6 +201,30 @@ async function updateMaxValue(tokenId, counterIndex, maxValueInput) {
     });
     let value = token.metadata[getPluginId("counters")][counterIndex].value;
     visualisation.setValue(token, counterIndex, value, maxValue);
+}
+
+function modifyValue(tokenId, counterIndex, modifyInput, valueInput) {
+    // let token = await getItem(tokenId);
+    let sign = modifyInput.value[0];
+    let number = Number(modifyInput.value.slice(1));
+    if(Number.isNaN(number)) {
+        // Invalid number.
+        return;
+    }
+
+    let value;
+    if(sign === "+") {
+        value = Number(valueInput.value) + number;
+    } else if(sign === "-") {
+        value = Number(valueInput.value) - number;
+    } else {
+        // Invalid sign.
+        return;
+    }
+
+    valueInput.value = value;
+    updateValue(tokenId, counterIndex, valueInput);
+    modifyInput.value = "";
 }
 
 function toggleShowSettings(showSettingsButton, settings) {

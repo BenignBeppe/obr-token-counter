@@ -2,7 +2,9 @@ body {
     margin: revert;
 }
 
-input[type="number"] {
+.value,
+.max-value,
+.modify {
     width: 4em;
 }
 
