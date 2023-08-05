@@ -26,7 +26,7 @@ input[type="number"] {
 }
 
 .show-settings .icon {
-    mask-image: url(/images/show-settings.svg)
+    mask-image: url(/images/settings.svg)
 }
 
 .show-number .icon {
