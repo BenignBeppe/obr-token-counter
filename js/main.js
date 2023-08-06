@@ -8,6 +8,10 @@ async function addCounter() {
         return;
     }
 
+    if(!(await hasAccess(token))) {
+        return;
+    }
+
     await OBR.scene.items.updateItems([token], (items) => {
         for(let item of items) {
             if(!Object.hasOwn(item.metadata, getPluginId("counters"))) {
@@ -59,14 +63,27 @@ async function getItem(itemId) {
     return items[0];
 }
 
-async function toggleGmOnly() {
-    let token = await getSelectedToken();
+async function hasAccess(token) {
     if(!token) {
-        return;
+        return false;
     }
 
     let playerRole = await OBR.player.getRole();
-    if(playerRole !== "GM") {
+    if(playerRole === "GM") {
+        return true;
+    }
+
+    let gmOnly = token.metadata[getPluginId("gmOnly")];
+    if(gmOnly) {
+        return false;
+    }
+
+    return true;
+}
+
+async function toggleGmOnly() {
+    let token = await getSelectedToken();
+    if(!token) {
         return;
     }
 
@@ -204,7 +221,6 @@ async function updateMaxValue(tokenId, counterIndex, maxValueInput) {
 }
 
 function modifyValue(tokenId, counterIndex, modifyInput, valueInput) {
-    // let token = await getItem(tokenId);
     let sign = modifyInput.value[0];
     let number = Number(modifyInput.value.slice(1));
     if(Number.isNaN(number)) {
@@ -290,26 +306,23 @@ function clearCounters() {
 
 document.querySelector("#add-counter").addEventListener("click", addCounter);
 let gmOnlyButton = document.querySelector("#gm-only");
-gmOnlyButton.addEventListener("click", toggleGmOnly);
 
-OBR.onReady(() => {
+OBR.onReady(async () => {
+    let playerRole = await OBR.player.getRole();
+    if(playerRole === "GM") {
+        gmOnlyButton.hidden = false;
+        gmOnlyButton.addEventListener("click", toggleGmOnly);
+    }
+
     OBR.player.onChange(async (player) => {
         let token = await getToken(player.selection);
-        if(!token) {
+        if(!token || !(await hasAccess(token))) {
             clearCounters();
             updateGmOnlyButton(false);
             return;
         }
 
         let gmOnly = token.metadata[getPluginId("gmOnly")];
-        if(gmOnly) {
-            let playerRole = await OBR.player.getRole();
-            if(playerRole !== "GM") {
-                clearPopover();
-                return;
-            }
-        }
-
         updateGmOnlyButton(gmOnly);
         updateCounters(token);
     });
