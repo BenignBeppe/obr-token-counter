@@ -8,15 +8,26 @@
         <title>Token counter</title>
     </head>
     <body>
-        <section id="controls">
-            <button id="add-counter" title="Add counter">
-                <div class="icon" style="mask-image: url(/images/add.svg)"></div>
-            </button>
-            <button hidden id="gm-only" title="Hide from non-GM players">
-                <div class="icon" style="mask-image: url(/images/gm-only.svg)"></div>
-            </button>
+        <section hidden id="controls" class="page">
+            <header>
+                <button id="add-counter" title="Add counter">
+                    <div class="icon" style="mask-image: url(/images/add.svg)"></div>
+                </button>
+                <button hidden id="gm-only" title="Hide from non-GM players">
+                    <div class="icon" style="mask-image: url(/images/gm-only.svg)"></div>
+                </button>
+            </header>
+            <ol id="counters"></ol>
         </section>
-        <ol id="counters"></ol>
+
+        <section id="no-token-text" class="page help-text">
+            <p>Select a token to view and edit counters.</p>
+        </section>
+
+        <section hidden id="secret-token-text" class="page help-text">
+            <p>The selected token is only accessible by GMs.</p>
+            <p><i>Are they hiding something?</i></p>
+        </section>
 
         <div id="templates" hidden>
             <li class="counter">

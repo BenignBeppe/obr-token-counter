@@ -2,6 +2,10 @@ import OBR, { buildText } from "@owlbear-rodeo/sdk";
 import { getPluginId, log } from "./util.js";
 import * as visualisation from "./visualisation.js";
 
+function showPage(page) {
+    pages.forEach(p => p.hidden = p !== page);
+}
+
 async function addCounter() {
     let token = await getSelectedToken();
     if(!token) {
@@ -307,6 +311,11 @@ function clearCounters() {
 document.querySelector("#add-counter").addEventListener("click", addCounter);
 let gmOnlyButton = document.querySelector("#gm-only");
 
+let controls = document.querySelector("#controls");
+let noTokenText = document.querySelector("#no-token-text");
+let secretTokenText = document.querySelector("#secret-token-text");
+let pages = document.querySelectorAll(".page");
+
 OBR.onReady(async () => {
     let playerRole = await OBR.player.getRole();
     if(playerRole === "GM") {
@@ -316,12 +325,17 @@ OBR.onReady(async () => {
 
     OBR.player.onChange(async (player) => {
         let token = await getToken(player.selection);
-        if(!token || !(await hasAccess(token))) {
-            clearCounters();
-            updateGmOnlyButton(false);
+        if(!token) {
+            showPage(noTokenText);
             return;
         }
 
+        if(!(await hasAccess(token))) {
+            showPage(secretTokenText);
+            return;
+        }
+
+        showPage(controls);
         let gmOnly = token.metadata[getPluginId("gmOnly")];
         updateGmOnlyButton(gmOnly);
         updateCounters(token);

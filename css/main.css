@@ -55,6 +55,13 @@ input[type="color"]:focus {
     outline-color: #fff;
 }
 
+.help-text {
+    font-size: 150%;
+    text-align: center;
+    margin: 1em;
+    margin-top: 3em;
+}
+
 .value,
 .max-value {
     width: 3em;
@@ -71,7 +78,7 @@ input[type="color"]:focus {
     background-color: #fff;
 }
 
-#controls {
+#controls header {
     border-bottom: 2px solid rgba(255, 255, 255, 0.24);
 }
 
