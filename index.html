@@ -4,17 +4,16 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script type="module" src="/js/main.js"></script>
-        <link rel="stylesheet" href="/css/obr.css">
         <link rel="stylesheet" href="/css/main.css">
         <title>Token counter</title>
     </head>
     <body>
         <section id="controls">
-            <button id="add-counter">
-                <img src="images/add.svg" title="Add counter">
+            <button id="add-counter" title="Add counter">
+                <div class="icon" style="mask-image: url(/images/add.svg)"></div>
             </button>
             <button id="gm-only" title="Hide from non-GM players">
-                <div class="icon"></div>
+                <div class="icon" style="mask-image: url(/images/gm-only.svg)"></div>
             </button>
         </section>
         <ol id="counters"></ol>
@@ -24,21 +23,21 @@
                 <input class="value" type="number"> / <input class="max-value" type="number">
                 <input class="modify" type="text">
                 <button class="show-settings" title="Show counter settings">
-                    <div class="icon"></div>
+                    <div class="icon" style="mask-image: url(/images/settings.svg)"></div>
                 </button>
                 <section class="settings" hidden>
                     <button class="show-as hide" title="Hide counter">
-                        <div class="icon"></div>
+                        <div class="icon" style="mask-image: url(/images/hide.svg)"></div>
                     </button>
                     <button class="show-as show-number" title="Show counter as number">
-                        <div class="icon"></div>
+                        <div class="icon" style="mask-image: url(/images/number.svg)"></div>
                     </button>
                     <button class="show-as show-bar" title="Show counter as bar">
-                        <div class="icon"></div>
+                        <div class="icon" style="mask-image: url(/images/bar.svg)"></div>
                     </button>
                     <input class="colour" type="color" title="Set colour for counter">
-                    <button class="remove" title="Remove counter">
-                        <img src="images/remove.svg">
+                    <button class="remove danger" title="Remove counter">
+                        <div class="icon" style="mask-image: url(/images/remove.svg)"></div>
                     </button>
                 </section>
             </li>
