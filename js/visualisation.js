@@ -125,6 +125,7 @@ function buildBase(builder, token, counterIndex) {
         .layer("ATTACHMENT")
         .visible(visible)
         .locked(true)
+        .disableHit(true)
         .metadata({
             [getPluginId("role")]: [VISUALISATION],
             [getPluginId("counterIndex")]: counterIndex
