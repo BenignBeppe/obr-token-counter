@@ -93,7 +93,18 @@ export async function setGmOnly(token, gmOnly) {
 
     OBR.scene.items.updateItems(visualisations, (items) => {
         for(let item of items) {
-            item.visible = !gmOnly;
+            if(gmOnly) {
+                item.visible = false;
+                item.disableAttachmentBehavior.push("VISIBLE");
+            } else {
+                item.visible = token.visible;
+                let visibleIndex = item.disableAttachmentBehavior.findIndex(e => e === "VISIBLE");
+                if(visibleIndex === -1) {
+                    continue;
+                }
+
+                item.disableAttachmentBehavior.splice(visibleIndex, 1);
+            }
         }
     });
 }
@@ -118,10 +129,15 @@ async function getVisualisations(token, startIndex) {
 }
 
 function buildBase(builder, token, counterIndex) {
-    let visible = !token.metadata[getPluginId("gmOnly")];
+    let visible = token.visible;
+    let disableAttachmentBehavior = ["SCALE", "ROTATION"];
+    if(token.metadata[getPluginId("gmOnly")]) {
+        visible = false;
+        disableAttachmentBehavior.push("VISIBLE");
+    }
     return builder
         .attachedTo(token.id)
-        .disableAttachmentBehavior(["SCALE", "ROTATION"])
+        .disableAttachmentBehavior(disableAttachmentBehavior)
         .layer("ATTACHMENT")
         .visible(visible)
         .locked(true)
