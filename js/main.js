@@ -1,6 +1,8 @@
-import OBR, { buildText } from "@owlbear-rodeo/sdk";
+import OBR, { buildImage } from "@owlbear-rodeo/sdk";
+
 import { getPluginId, log } from "./util.js";
 import * as visualisation from "./visualisation.js";
+import * as DeadMarker from "./dead-marker.js";
 
 function showPage(page) {
     pages.forEach(p => p.hidden = p !== page);
@@ -36,7 +38,7 @@ async function addCounter() {
     log(`Added counter to token ${token.id} ("${token.name})"`);
 }
 
-async function getSelectedToken() {
+export async function getSelectedToken() {
     let selectedIds = await OBR.player.getSelection();
     let token = await getToken(selectedIds);
     return token;
@@ -45,16 +47,25 @@ async function getSelectedToken() {
 /**
  * Get the first token from item ids
  *
- * A "token" is here defined as an item on the character layer.
+ * A "token" is here defined as an item on the character or mount
+ * layer or an item with the "dead" property true.
  */
 async function getToken(itemIds) {
     if(!itemIds) {
         return;
     }
 
-    let tokens = await OBR.scene.items.getItems(
-        i => itemIds.includes(i.id) && i.layer === "CHARACTER"
-    );
+    let layers = ["CHARACTER", "MOUNT"];
+    let tokens = await OBR.scene.items.getItems(item => {
+        if(!itemIds.includes(item.id)) {
+            return false;
+        }
+
+        if(layers.includes(item.layer) || item.metadata[getPluginId("dead")]) {
+            return true;
+        }
+    });
+
     if(!tokens.length) {
         return;
     }
@@ -300,7 +311,7 @@ async function removeCounter(tokenId, counterIndex) {
     let updatedToken = await getItem(tokenId);
     updateCounters(updatedToken);
     visualisation.remove(updatedToken, counterIndex);
-    log(`Removed counter with index ${counterIndex} from token ${token.id} ("${token.name})"`);
+    log(`Removed counter with index ${counterIndex} from token ${token.id} ("${token.name}")`);
 }
 
 function clearCounters() {
@@ -340,4 +351,6 @@ OBR.onReady(async () => {
         updateGmOnlyButton(gmOnly);
         updateCounters(token);
     });
+
+    DeadMarker.addMenuItem();
 });
