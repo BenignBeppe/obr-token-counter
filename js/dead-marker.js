@@ -50,7 +50,7 @@ function markDead(token) {
         {
             width: token.image.width,
             height: token.image.height,
-            url: `${window.location.origin}/images/dead.png`,
+            url: `${window.location.origin}/images/dead-marker.png`,
             mime: "image/png",
         },
         token.grid
