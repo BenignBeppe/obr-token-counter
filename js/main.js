@@ -130,20 +130,24 @@ function updateCounters(token) {
         let element = template.cloneNode(true);
         let metadata = token.metadata[getPluginId("counters")][index];
 
+        let label = element.querySelector(".counter-label");
+        label.textContent = metadata.label;
+        if(metadata.label === "") {
+            label.hidden = true;
+        }
+    
         let valueInput = element.querySelector(".value");
         valueInput.value = metadata.value;
         valueInput.addEventListener(
             "change",
             () => updateValue(token.id, index, valueInput)
         );
-
         let maxValueInput = element.querySelector(".max-value");
         maxValueInput.value = metadata.maxValue;
         maxValueInput.addEventListener(
             "change",
             () => updateMaxValue(token.id, index, maxValueInput)
         );
-
         let modifyInput = element.querySelector(".modify");
         modifyInput.addEventListener(
             "change",
@@ -156,7 +160,12 @@ function updateCounters(token) {
             "click",
             () => toggleShowSettings(showSettingsButton, settings)
         );
-
+        
+        let editLabelButton = element.querySelector(".edit-label");
+        editLabelButton.addEventListener(
+            "click",
+            () => editLabel(token.id, index)
+        );
         let hideButton = element.querySelector(".hide");
         if(metadata.showAs === visualisation.HIDDEN) {
             hideButton.classList.add("selected");
@@ -265,6 +274,24 @@ function toggleShowSettings(showSettingsButton, settings) {
     } else {
         showSettingsButton.classList.add("selected");
     }
+}
+
+async function editLabel(tokenId, counterIndex) {
+    let token = await getItem(tokenId);
+    let currentLabel = token.metadata[getPluginId("counters")][counterIndex].label || "";
+    let label = prompt("Enter label for counter:", currentLabel);
+    if(label === null || label === currentLabel) {
+        return;
+    }
+
+    await OBR.scene.items.updateItems([token], (items) => {
+        for(let item of items) {
+            item.metadata[getPluginId("counters")][counterIndex].label = label;
+        }
+    });
+    
+    token = await getItem(tokenId);
+    updateCounters(token);
 }
 
 async function updateShowAs(tokenId, counterIndex, showAs) {
