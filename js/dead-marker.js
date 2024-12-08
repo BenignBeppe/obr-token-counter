@@ -46,14 +46,21 @@ function markDead(token) {
         }
     });
 
-    let item = buildImage(
+    let markerSize = 512;
+    let marker = buildImage(
         {
-            width: token.image.width,
-            height: token.image.height,
+            width: markerSize,
+            height: markerSize,
             url: `${window.location.origin}/images/dead-marker.png`,
             mime: "image/png",
         },
-        token.grid
+        {
+            offset: {
+                x: token.grid.offset.x / token.image.width * markerSize,
+                y: token.grid.offset.y / token.image.height * markerSize
+            },
+            dpi: token.grid.dpi / token.image.width * markerSize
+        }
     )
         .layer("PROP")
         .attachedTo(token.id)
@@ -65,7 +72,7 @@ function markDead(token) {
             [getPluginId("role")]: ["DEAD"],
         })
         .build();
-    OBR.scene.items.addItems([item]);
+    OBR.scene.items.addItems([marker]);
 }
 
 export function addMenuItem() {
